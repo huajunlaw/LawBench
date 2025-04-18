@@ -24,7 +24,6 @@ def completion(
         headers={"Authorization": f"Bearer {api_key}"},
         timeout=1000,
     )
-    logger.info(resp.text)
     return resp.json()
 
 
@@ -50,12 +49,13 @@ def main():
             data_list = read_json(input_file)
             predictions = {}
             for cnt, item in enumerate(data_list):
+                logger.info(item)
                 promopt = f"{item['instruction']}\n{item['question']}"
                 messages = [{"role": "user", "content": promopt}]
                 logger.info(messages)
                 resp = completion(messages)
                 logger.info(resp)
-                prediction = resp["content"]
+                prediction = resp['choices'][0]['message']["content"]
                 predictions[f"{cnt}"] = {
                     "origin_prompt": promopt,
                     "prediction": prediction,
