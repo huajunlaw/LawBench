@@ -1,5 +1,6 @@
 import json
 import os
+import argparse, sys
 
 from loguru import logger
 from requests import post
@@ -13,8 +14,8 @@ def read_json(input_file):
 
 def completion(
     messages: list[dict[str, str]],
-    endpoint="http://127.0.0.1:8000/v1/chat/completions",
-    api_key="huajunlaw.ai",
+    endpoint="http://127.0.0.1:11434/v1/chat/completions",
+    api_key="xxx",
 ):
     resp = post(
         endpoint,
@@ -27,11 +28,23 @@ def completion(
     return resp.json()
 
 
-def main():
+def main(argv):
     """生成LawBench."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--endpoint", dest="endpoint",
+                  help="endpoint: it should be a url ")
+    parser.add_argument("-m", "--model", dest="model",
+                  help="model: it should be a str ")
+    parser.add_argument("-k", "--key", dest="api_key",
+                  help="key: it should be a str")
+    args = parser.parse_args(argv)
+    logger.info(args)
+    endpoint = args.endpoint
+    api_key = args.api_key
+    model_name = args.model or "lawchat"
+    logger.info(model_name)
     data_path = "./data"
     prediction_path = "./predictions"
-    model_name = "lawchat"
     data_dirs = os.listdir(data_path)
     for data_dir in data_dirs:
         if data_dir.startswith("."):
@@ -46,6 +59,11 @@ def main():
             os.makedirs(out_path)
         for data_file in data_files:
             input_file = os.path.join(data_dir_path, data_file)
+            if not os.path.exists(input_file):
+                continue
+            output_file = os.path.join(out_path, data_file)
+            if os.path.exists(output_file):
+                continue
             data_list = read_json(input_file)
             predictions = {}
             for cnt, item in enumerate(data_list):
@@ -53,7 +71,7 @@ def main():
                 promopt = f"{item['instruction']}\n{item['question']}"
                 messages = [{"role": "user", "content": promopt}]
                 logger.info(messages)
-                resp = completion(messages)
+                resp = completion(messages, endpoint=endpoint, api_key=api_key)
                 logger.info(resp)
                 prediction = resp['choices'][0]['message']["content"]
                 predictions[f"{cnt}"] = {
@@ -61,9 +79,9 @@ def main():
                     "prediction": prediction,
                     "refr": item["answer"],
                 }
-            with open(os.path.join(out_path, data_file), "w") as f:
+            with open(output_file, "w") as f:
                 f.write(json.dumps(predictions, ensure_ascii=False))
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
