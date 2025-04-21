@@ -3,7 +3,7 @@ import os
 import argparse, sys
 
 from loguru import logger
-from requests import post
+from requests import post, get
 
 
 def read_json(input_file):
@@ -11,20 +11,32 @@ def read_json(input_file):
         data_list = json.load(f)
     return data_list
 
-
-def completion(
-    messages: list[dict[str, str]],
-    endpoint="http://127.0.0.1:11434/v1/chat/completions",
-    api_key="xxx",
-):
-    resp = post(
-        endpoint,
-        json={
-            "messages": messages,
-        },
+def get_models(endpoint="/v1/models", api_key="xxx"):
+    resp = get(
+        f"{endpoint}/v1/models",
         headers={"Authorization": f"Bearer {api_key}"},
         timeout=1000,
     )
+    logger.info(resp.text)
+    return resp.json()
+    
+
+def completion(
+    messages: list[dict[str, str]],
+    endpoint="http://127.0.0.1:11434",
+    api_key="xxx",
+    model_name=""
+):
+    req_json = {"messages": messages,} 
+    if model_name:
+        req_json['model'] = model_name 
+    resp = post(
+        f"{endpoint}/v1/chat/completions",
+        json=req_json,
+        headers={"Authorization": f"Bearer {api_key}"},
+        timeout=1000,
+    )
+    logger.info(resp.text)
     return resp.json()
 
 
@@ -60,6 +72,7 @@ def main(argv):
         for data_file in data_files:
             input_file = os.path.join(data_dir_path, data_file)
             if not os.path.exists(input_file):
+                logger.info(input_file)
                 continue
             output_file = os.path.join(out_path, data_file)
             if os.path.exists(output_file):
@@ -70,9 +83,7 @@ def main(argv):
                 logger.info(item)
                 promopt = f"{item['instruction']}\n{item['question']}"
                 messages = [{"role": "user", "content": promopt}]
-                logger.info(messages)
-                resp = completion(messages, endpoint=endpoint, api_key=api_key)
-                logger.info(resp)
+                resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
                 prediction = resp['choices'][0]['message']["content"]
                 predictions[f"{cnt}"] = {
                     "origin_prompt": promopt,
