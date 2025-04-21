@@ -1,0 +1,22 @@
+[project]
+name = "lawbench"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cn2an>=0.5.23",
+    "jieba>=0.42.1",
+    "levenshtein>=0.27.1",
+    "loguru>=0.7.3",
+    "ltp>=4.2.14",
+    "nltk>=3.9.1",
+    "opencc>=1.1.9",
+    "pandas>=2.2.3",
+    "pypinyin>=0.54.0",
+    "requests>=2.32.3",
+    "rouge-chinese>=1.0.3",
+    "timeout-decorator>=0.5.0",
+]
+[tool.uv]
+index-url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
