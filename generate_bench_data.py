@@ -11,7 +11,8 @@ def read_json(input_file):
         data_list = json.load(f)
     return data_list
 
-def get_models(endpoint="/v1/models", api_key="xxx"):
+
+def get_models(endpoint="http://127.0.0.1:11434", api_key="xxx"):
     resp = get(
         f"{endpoint}/v1/models",
         headers={"Authorization": f"Bearer {api_key}"},
@@ -30,6 +31,7 @@ def completion(
     req_json = {"messages": messages,} 
     if model_name:
         req_json['model'] = model_name 
+    logger.info(req_json)
     resp = post(
         f"{endpoint}/v1/chat/completions",
         json=req_json,
@@ -49,49 +51,43 @@ def main(argv):
                   help="model: it should be a str ")
     parser.add_argument("-k", "--key", dest="api_key",
                   help="key: it should be a str")
+    parser.add_argument("-s", "--shot", dest="shot",
+                  help="shot: it should be a str")
     args = parser.parse_args(argv)
     logger.info(args)
     endpoint = args.endpoint
     api_key = args.api_key
+    shot = args.shot or "one_shot"
     model_name = args.model or "lawchat"
-    logger.info(model_name)
-    data_path = "./data"
+    data_path = f"./data/{shot}"
+    logger.info(data_path)
     prediction_path = "./predictions"
-    data_dirs = os.listdir(data_path)
-    for data_dir in data_dirs:
-        if data_dir.startswith("."):
+    data_files = os.listdir(data_path)
+    out_path = os.path.join(prediction_path, shot, model_name)
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    for data_file in data_files:
+        input_file = os.path.join(data_path, data_file)
+        if not os.path.exists(input_file):
+            logger.info(input_file)
             continue
-        data_dir_path = os.path.join(data_path, data_dir)
-        if not os.path.isdir(data_dir_path):
+        output_file = os.path.join(out_path, data_file)
+        if os.path.exists(output_file):
             continue
-        data_files = os.listdir(data_dir_path)
-        logger.info(f"*** Evaluating System: {data_dir} ***")
-        out_path = os.path.join(prediction_path, data_dir, model_name)
-        if not os.path.exists(out_path):
-            os.makedirs(out_path)
-        for data_file in data_files:
-            input_file = os.path.join(data_dir_path, data_file)
-            if not os.path.exists(input_file):
-                logger.info(input_file)
-                continue
-            output_file = os.path.join(out_path, data_file)
-            if os.path.exists(output_file):
-                continue
-            data_list = read_json(input_file)
-            predictions = {}
-            for cnt, item in enumerate(data_list):
-                logger.info(item)
-                promopt = f"{item['instruction']}\n{item['question']}"
-                messages = [{"role": "user", "content": promopt}]
-                resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
-                prediction = resp['choices'][0]['message']["content"]
-                predictions[f"{cnt}"] = {
-                    "origin_prompt": promopt,
-                    "prediction": prediction,
-                    "refr": item["answer"],
-                }
-            with open(output_file, "w") as f:
-                f.write(json.dumps(predictions, ensure_ascii=False))
+        data_list = read_json(input_file)
+        predictions = {}
+        for cnt, item in enumerate(data_list):
+            promopt = f"{item['instruction']}\n{item['question']}"
+            messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
+            resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
+            prediction = resp['choices'][0]['message']["content"]
+            predictions[f"{cnt}"] = {
+                "origin_prompt": promopt,
+                "prediction": prediction,
+                "refr": item["answer"],
+            }
+        with open(output_file, "w") as f:
+            f.write(json.dumps(predictions, ensure_ascii=False))
 
 
 if __name__ == "__main__":
