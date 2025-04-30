@@ -79,6 +79,8 @@ def main(argv):
         for cnt, item in enumerate(data_list):
             promopt = f"{item['instruction']}\n{item['question']}"
             messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
+            if len(json.dumps(messages)) > 28192:
+                logger.info(messages)
             resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
             prediction = resp['choices'][0]['message']["content"]
             predictions[f"{cnt}"] = {
