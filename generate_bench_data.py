@@ -36,7 +36,7 @@ def completion(
         f"{endpoint}/v1/chat/completions",
         json=req_json,
         headers={"Authorization": f"Bearer {api_key}"},
-        timeout=1000,
+        timeout=100,
     )
     logger.info(resp.text)
     return resp.json()
@@ -53,6 +53,7 @@ def main(argv):
                   help="key: it should be a str")
     parser.add_argument("-s", "--shot", dest="shot",
                   help="shot: it should be a str")
+
     args = parser.parse_args(argv)
     logger.info(args)
     endpoint = args.endpoint
@@ -76,13 +77,17 @@ def main(argv):
             continue
         data_list = read_json(input_file)
         predictions = {}
-        for cnt, item in enumerate(data_list):
+        for cnt, item in enumerate(data_list[:50]):
             promopt = f"{item['instruction']}\n{item['question']}"
             messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
             if len(json.dumps(messages)) > 28192:
                 logger.info(messages)
-            resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
-            prediction = resp['choices'][0]['message']["content"]
+            try:
+                resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
+                prediction = resp['choices'][0]['message']["content"]
+            except Exception as E:
+                logger.info(E)
+                continue
             predictions[f"{cnt}"] = {
                 "origin_prompt": promopt,
                 "prediction": prediction,
