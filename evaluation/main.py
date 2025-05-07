@@ -13,8 +13,9 @@ def read_json(input_file):
     dict_size = len(data_dict)
     new_data_dict = []
     for i in range(dict_size):
-        example = data_dict[str(i)]
-        new_data_dict.append(example)
+        if str(i) in data_dict:
+            example = data_dict[str(i)]
+            new_data_dict.append(example)
 
     return new_data_dict
 
