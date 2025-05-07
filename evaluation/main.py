@@ -55,6 +55,12 @@ def main(argv):
     for system_folder in system_folders:
         if system_folder.startswith("."):
             continue
+        if system_folder.startswith("llama"):
+            continue
+        if system_folder.endswith("hf"):
+            continue
+        if system_folder in ('GPT-3.5-turbo-0613', 'GPT4', 'gogpt-7b',):
+            continue
         system_folder_dir = os.path.join(input_dir, system_folder)
         if not os.path.isdir(system_folder_dir):
             continue
