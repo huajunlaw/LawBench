@@ -10,15 +10,7 @@ def read_json(input_file):
     with open(input_file, "r", encoding="utf-8") as f:
         data_dict = json.load(f)
 
-    dict_size = len(data_dict)
-    new_data_dict = []
-    for i in range(dict_size):
-        if str(i) in data_dict:
-            example = data_dict[str(i)]
-            new_data_dict.append(example)
-
-    return new_data_dict
-
+    return list(data_dict.values())
 
 def main(argv):
     parser = argparse.ArgumentParser()
