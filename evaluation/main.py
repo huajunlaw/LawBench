@@ -11,7 +11,128 @@ def read_json(input_file):
         data_dict = json.load(f)
 
     return list(data_dict.values())
-
+task_dict = {
+  "1-1": {
+    "task_name": "法条背诵",
+    "data_source": "FLK",
+    "metrices": "ROUGE-L",
+    "type": "生成"
+  },
+  "1-2": {
+    "task_name": "知识问答",
+    "data_source": "JEC_QA",
+    "metrices": "Accuracy",
+    "type": "单选"
+  },
+  "2-1": {
+    "task_name": "文件校对",
+    "data_source": "CAIL2022",
+    "metrices": "F0.5",
+    "type": "生成"
+  },
+  "2-2": {
+    "task_name": "纠纷焦点识别",
+    "data_source": "LAIC2021",
+    "metrices": "F1",
+    "type": "多选"
+  },
+  "2-3": {
+    "task_name": "婚姻纠纷鉴定",
+    "data_source": "AIStudio",
+    "metrices": "F1",
+    "type": "多选"
+  },
+  "2-4": {
+    "task_name": "问题主题识别",
+    "data_source": "CrimeKgAssitant",
+    "metrices": "Accuracy",
+    "type": "单选"
+  },
+  "2-5": {
+    "task_name": "阅读理解",
+    "data_source": "CAIL2019",
+    "metrices": "rc-F1",
+    "type": "抽取"
+  },
+  "2-6": {
+    "task_name": "命名实体识别",
+    "data_source": "CAIL2021",
+    "metrices": "soft-F1",
+    "type": "抽取"
+  },
+  "2-7": {
+    "task_name": "舆情摘要",
+    "data_source": "CAIL2022",
+    "metrices": "ROUGE-L",
+    "type": "生成"
+  },
+  "2-8": {
+    "task_name": "论点挖掘",
+    "data_source": "CAIL2022",
+    "metrices": "Accuracy",
+    "type": "单选"
+  },
+  "2-9": {
+    "task_name": "事件检测",
+    "data_source": "LEVEN",
+    "metrices": "F1",
+    "type": "多选"
+  },
+  "2-10": {
+    "task_name": "触发词提取",
+    "data_source": "LEVEN",
+    "metrices": "soft-F1",
+    "type": "抽取"
+  },
+  "3-1": {
+    "task_name": "法条预测(基于事实)",
+    "data_source": "CAIL2018",
+    "metrices": "F1",
+    "type": "多选"
+  },
+  "3-2": {
+    "task_name": "法条预测(基于场景)",
+    "data_source": "LawGPT_zh Project",
+    "metrices": "ROUGE-L",
+    "type": "生成"
+  },
+  "3-3": {
+    "task_name": "罪名预测",
+    "data_source": "CAIL2018",
+    "metrices": "F1",
+    "type": "多选"
+  },
+  "3-4": {
+    "task_name": "刑期预测(无法条内容)",
+    "data_source": "CAIL2018",
+    "metrices": "Normalized log-distance",
+    "type": "回归"
+  },
+  "3-5": {
+    "task_name": "刑期预测(给定法条内容)",
+    "data_source": "CAIL2018",
+    "metrices": "Normalized log-distance",
+    "type": "回归"
+  },
+  "3-6": {
+    "task_name": "案例分析",
+    "data_source": "JEC_QA",
+    "metrices": "Accuracy",
+    "type": "单选"
+  },
+  "3-7": {
+    "task_name": "犯罪金额计算",
+    "data_source": "LAIC2021",
+    "metrices": "Accuracy",
+    "type": "回归"
+  },
+  "3-8": {
+    "task_name": "咨询",
+    "data_source": "hualv.com",
+    "metrices": "ROUGE-L",
+    "type": "生成"
+  }
+}
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_folder", dest="input_folder",
@@ -42,7 +163,7 @@ def main(argv):
     input_dir = args.input_folder
 
     output_file = args.outfile
-    results = {"task": [], "model_name": [], "score": [], "abstention_rate": []}
+    results = {"task": [], "model_name": [], "score": [], "abstention_rate": [], "task_type": []}
     # list all folders in input_dir
     system_folders = os.listdir(input_dir)
     for system_folder in system_folders:
@@ -71,7 +192,8 @@ def main(argv):
             score_function = funct_dict[datafile_name]
             score = score_function(data_dict)
             print(f"Score of {datafile_name}: {score}")
-            results["task"].append(datafile_name)
+            results["task"].append(task_dict[datafile_name]['task_name'])
+            results["metrics"].append(task_dict[datafile_name]['metrices'])
             results["model_name"].append(system_folder)
             results["score"].append(score["score"])
             abstention_rate = score["abstention_rate"] if "abstention_rate" in score else 0
