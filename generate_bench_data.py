@@ -1,5 +1,5 @@
 import json
-import os
+import os, random
 import argparse, sys
 
 from loguru import logger
@@ -77,7 +77,7 @@ def main(argv):
             continue
         data_list = read_json(input_file)
         predictions = {}
-        for cnt, item in enumerate(data_list[:50]):
+        for cnt, item in enumerate(random.sample(data_list, 50)):
             promopt = f"{item['instruction']}\n{item['question']}"
             messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
             if len(json.dumps(messages)) > 28192:
