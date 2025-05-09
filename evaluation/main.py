@@ -163,7 +163,7 @@ def main(argv):
     input_dir = args.input_folder
 
     output_file = args.outfile
-    results = {"task": [], "model_name": [], "score": [], "abstention_rate": [], "task_type": []}
+    results = {"task": [], "model_name": [], "score": [], "abstention_rate": [], "metrics": []}
     # list all folders in input_dir
     system_folders = os.listdir(input_dir)
     for system_folder in system_folders:
