@@ -90,7 +90,7 @@ def main(argv):
                 continue
             predictions[f"{cnt}"] = {
                 "origin_prompt": promopt,
-                "prediction": prediction,
+                "prediction": prediction or "",
                 "refr": item["answer"],
             }
         with open(output_file, "w") as f:
