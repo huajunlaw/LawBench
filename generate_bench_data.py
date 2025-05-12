@@ -28,7 +28,7 @@ def completion(
     api_key="xxx",
     model_name=""
 ):
-    req_json = {"messages": messages, "repetition_penalty": 1.05, "temperature": 0.7, "top_k": 20, "top_p": 0.8, "chat_template_kwargs": {"enable_thinking": False}}
+    req_json = {"messages": messages, "repetition_penalty": 1.05, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
     if model_name:
         req_json['model'] = model_name 
     logger.info(req_json)
