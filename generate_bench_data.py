@@ -26,12 +26,14 @@ def completion(
     messages: list[dict[str, str]],
     endpoint="http://127.0.0.1:11434",
     api_key="xxx",
-    model_name=""
+    model_name="",
+    params=None,
 ):
     req_json = {"messages": messages, "repetition_penalty": 1.05, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
     if model_name:
         req_json['model'] = model_name 
-    logger.info(req_json)
+    if params and isinstance(params, str):
+        req_json.update(json.loads(params))
     resp = post(
         f"{endpoint}/v1/chat/completions",
         json=req_json,
@@ -53,6 +55,9 @@ def main(argv):
                   help="key: it should be a str")
     parser.add_argument("-s", "--shot", dest="shot",
                   help="shot: it should be a str")
+    parser.add_argument("-p", "--parameters", dest="parameters",
+                  help="shot: parameters")
+
 
     args = parser.parse_args(argv)
     logger.info(args)
@@ -60,6 +65,7 @@ def main(argv):
     api_key = args.api_key
     shot = args.shot or "one_shot"
     model_name = args.model or "lawchat"
+    params = args.parameters.replace("'", '"') or None
     data_path = f"./data/{shot}"
     logger.info(data_path)
     prediction_path = "./predictions"
@@ -83,11 +89,12 @@ def main(argv):
             if len(json.dumps(messages)) > 28192:
                 logger.info(messages)
             try:
-                resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name)
+                resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params)
                 prediction = resp['choices'][0]['message']["content"]
             except Exception as E:
                 logger.info(E)
                 continue
+
             predictions[f"{cnt}"] = {
                 "origin_prompt": promopt,
                 "prediction": prediction or "",
