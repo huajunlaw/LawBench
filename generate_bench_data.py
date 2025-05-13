@@ -93,14 +93,14 @@ def main(argv):
                 logger.info(messages)
             try:
                 resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params)
-                prediction = resp['choices'][0]['message']["content"]
+                prediction = resp['choices'][0]['message']["content"] or ""
             except Exception as E:
                 logger.info(E)
                 continue
 
             predictions[f"{cnt}"] = {
                 "origin_prompt": promopt,
-                "prediction": prediction.replace("<think>\n\n</think>\n\n", "") or "",
+                "prediction": prediction.replace("<think>\n\n</think>\n\n", ""),
                 "refr": item["answer"],
             }
             logger.info(prediction)
