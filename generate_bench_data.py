@@ -29,7 +29,7 @@ def completion(
     model_name="",
     params=None,
 ):
-    req_json = {"messages": messages, "repetition_penalty": 1.05, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+    req_json = {"messages": messages, "repetition_penalty": 1.5, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
     if model_name:
         req_json['model'] = model_name 
     if params and isinstance(params, str):
@@ -97,9 +97,10 @@ def main(argv):
 
             predictions[f"{cnt}"] = {
                 "origin_prompt": promopt,
-                "prediction": prediction or "",
+                "prediction": prediction.replace("<think>\n\n</think>\n\n", "") or "",
                 "refr": item["answer"],
             }
+            logger.info(prediction)
         with open(output_file, "w") as f:
             f.write(json.dumps(predictions, ensure_ascii=False))
 
