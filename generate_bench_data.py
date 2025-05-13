@@ -65,7 +65,9 @@ def main(argv):
     api_key = args.api_key
     shot = args.shot or "one_shot"
     model_name = args.model or "lawchat"
-    params = args.parameters.replace("'", '"') or None
+    params = args.parameters or None
+    if params:
+        params = params.replace("'", '"')
     data_path = f"./data/{shot}"
     logger.info(data_path)
     prediction_path = "./predictions"
