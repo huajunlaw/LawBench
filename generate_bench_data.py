@@ -34,6 +34,7 @@ def completion(
         req_json['model'] = model_name 
     if params and isinstance(params, str):
         req_json.update(json.loads(params))
+    logger.info(req_json)
     resp = post(
         f"{endpoint}/v1/chat/completions",
         json=req_json,
