@@ -94,7 +94,7 @@ def main(argv):
                 logger.info(messages)
             try:
                 resp = completion(messages, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params)
-                prediction = resp['choices'][0]['message']["content"] or ""
+                prediction = resp['choices'][0]['message']["content"] or resp['choices'][0]['message']["reasoning_content"] or ""
             except Exception as E:
                 logger.info(E)
                 continue
