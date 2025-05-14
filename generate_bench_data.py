@@ -39,7 +39,7 @@ def completion(
         f"{endpoint}/v1/chat/completions",
         json=req_json,
         headers={"Authorization": f"Bearer {api_key}"},
-        timeout=100,
+        timeout=60,
     )
     logger.info(resp.text)
     return resp.json()
