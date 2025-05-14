@@ -87,9 +87,9 @@ def main(argv):
         data_list = read_json(input_file)
         predictions = {}
         for cnt, item in enumerate(random.sample(data_list, 50)):
-            # promopt = f"\n{item['question']}"
+            # promopt = f"{item['instruction']}\n{item['question']}"
             # messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
-            messages = [{"role": "system", "content": {item['instruction']}}, {"role": "user", "content": item['question']}]
+            messages = [{"role": "system", "content": item['instruction']}, {"role": "user", "content": item['question']}]
             if len(json.dumps(messages)) > 28192:
                 logger.info(messages)
             try:
