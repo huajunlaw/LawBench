@@ -19,16 +19,24 @@ def main():
         os.makedirs(out_path)
     for data_file in data_files:
         input_file = os.path.join(data_path, data_file)
-        if not os.path.exists(input_file):
-            logger.info(input_file)
-            continue
         output_file = os.path.join(out_path, data_file)
-        if os.path.exists(output_file):
-            continue
+        logger.info(input_file)
         data_list = read_json(input_file)
         predictions = []
-        for item in data_list:
+        data_len = len(data_list)
+        for cnt, item in enumerate(data_list):
             promopt = item['instruction']
+            logger.info(item)
+            _1 = data_list[-(data_len - 1 -cnt)]
+            logger.info(_1)
+            logger.info(data_list[1])
+            _2 = data_list[-(data_len - 2 -cnt)]
+            logger.info(_2)
+            if '<eoa>' in promopt:
+                sep = '<eoa>'
+            else:
+                sep = ''
+            promopt = promopt.replace("下面是一个例子:\n", f"下面是三个例子:\n{_1['question']}\n{_1['answer']}{sep}\n{_2['question']}\n{_2['answer']}{sep}\n")
             predictions.append({
                 "instruction": promopt,
                 "question": item["question"], 
