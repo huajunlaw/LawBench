@@ -27,12 +27,12 @@ def get_models(endpoint="http://127.0.0.1:11434", api_key="xxx"):
 async def completion(cnt, item, predictions, session: aiohttp.ClientSession, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}):
     promopt = f"{item['instruction']}\n{item['question']}"
     messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
-    req_json = {"messages": messages, "repetition_penalty": 1.3, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+    req_json = {"messages": messages, "repetition_penalty": 1.35, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
     if model_name:
         req_json['model'] = model_name 
     if params and isinstance(params, str):
         req_json.update(json.loads(params))
-    async with session.get(f"{endpoint}/v1/chat/completions", json=req_json, headers={"Authorization": f"Bearer {api_key}"},timeout=timeout) as response:
+    async with session.post(f"{endpoint}/v1/chat/completions", json=req_json, headers={"Authorization": f"Bearer {api_key}"},timeout=timeout) as response:
         resp = await response.json()
         prediction = resp['choices'][0]['message']["content"] or resp['choices'][0]['message']["reasoning_content"] or ""
         predictions[f"{cnt}"] = {
