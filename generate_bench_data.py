@@ -4,8 +4,8 @@ import os, random
 import argparse, sys
 
 from loguru import logger
-from requests import post, get
-timeout = aiohttp.ClientTimeout(total=100)  # 设置超时时间
+from requests import get
+timeout = aiohttp.ClientTimeout(total=600)  # 设置超时时间
 
 
 def read_json(input_file):
