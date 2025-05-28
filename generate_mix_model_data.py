@@ -32,13 +32,14 @@ async def completion(cnt, item, predictions, endpoint="http://127.0.0.1:11434", 
         req_json['model'] = model_name 
     if params and isinstance(params, str):
         req_json.update(json.loads(params))
+    logger.info(req_json)
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{endpoint}/v1/chat/completions", json=req_json, headers={"Authorization": f"Bearer {api_key}"},timeout=timeout) as response:
             resp = await response.json()
             prediction = resp['choices'][0]['message']["content"] or resp['choices'][0]['message']["reasoning_content"] or ""
             predictions[f"{cnt}"] = {
                     "origin_prompt": promopt,
-                    "prediction": prediction.replace("<think>\n\n</think>\n\n", ""),
+                    "prediction": prediction.replace("<think>", "").replace("</think>", ""),
                     "refr": item["answer"],
                 }
             logger.info(prediction)
@@ -87,14 +88,13 @@ def main(argv):
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     for data_file in data_files:
-        logger.info(model_dict)
         if 'rag' in model_dict[data_file]:
             input_file = os.path.join(f"{data_path}_rag", data_file)
         else:
             input_file = os.path.join(data_path, data_file)
         if not os.path.exists(input_file):
-            logger.info(input_file)
             continue
+        logger.info(input_file)
         output_file = os.path.join(out_path, data_file)
         if os.path.exists(output_file):
             continue
