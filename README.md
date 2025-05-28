@@ -46,7 +46,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-qdov">1-1</td>
     <td class="tg-qdov">法条背诵</td>
     <td class="tg-qdov"><a href="https://flk.npc.gov.cn/">FLK</a></td>
-    <td class="tg-qdov">ROUGE-L</td>
+    <td class="tg-qdov"><a href="https://github.com/huajunlaw/LawBench/blob/main/ROUGE-L.md">ROUGE-L</td>
     <td class="tg-qdov">生成</td>
   </tr>
   <tr>
@@ -103,7 +103,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-7</td>
     <td class="tg-0pky">舆情摘要</td>
     <td class="tg-0pky"><a href="http://cail.cipsc.org.cn/task_summit.html?raceID=4&cail_tag=2022">CAIL2022</a></td>
-    <td class="tg-0pky">ROUGE-L</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/ROUGE-L.md">ROUGE-L</td>
      <td class="tg-0pky">生成</td>
   </tr>
   <tr>
@@ -139,7 +139,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">3-2</td>
     <td class="tg-0pky">法条预测(基于场景)</td>
     <td class="tg-0pky"><a href="https://github.com/LiuHC0428/LAW-GPT">LawGPT_zh Project</a></td>
-    <td class="tg-0pky">ROUGE-L</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/ROUGE-L.md">ROUGE-L</td>
      <td class="tg-0pky">生成</td>
   </tr>
   <tr>
@@ -181,7 +181,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0lax">3-8</td>
     <td class="tg-0lax">咨询</td>
     <td class="tg-0lax"><a href="https://www.66law.cn/">hualv.com</a></td>
-    <td class="tg-0lax">ROUGE-L</td>
+    <td class="tg-0lax"><a href="https://github.com/huajunlaw/LawBench/blob/main/ROUGE-L.md">ROUGE-L</td>
      <td class="tg-0lax">生成</td>
   </tr>
 </tbody>
