@@ -55,7 +55,7 @@ async def completion(cnt, item, predictions, endpoint="http://127.0.0.1:11434", 
 async def new_func(endpoint, api_key, model_name, params, output_file, data_list):
     predictions = {}
     tasks = []
-    for cnt, item in enumerate(random.sample(data_list, 50)):
+    for cnt, item in enumerate(random.sample(data_list, 100)):
         try:
             task = asyncio.create_task(completion(cnt, item, predictions, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params))
         except Exception as E:
