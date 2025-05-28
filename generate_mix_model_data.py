@@ -31,8 +31,8 @@ def get_models(endpoint="http://127.0.0.1:11434", api_key="xxx"):
     
 
 async def completion(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}):
-    promopt = f"{item['instruction']}\n{item['question']}"
-    messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": promopt}]
+    prompt = f"{item['instruction']}\n{item['question']}"
+    messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": prompt}]
     req_json = {"messages": messages, "repetition_penalty": 1.05, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
     if model_name:
         req_json['model'] = model_name 
@@ -45,7 +45,7 @@ async def completion(cnt, item, predictions, endpoint="http://127.0.0.1:11434", 
             prediction = resp['choices'][0]['message']["content"] or resp['choices'][0]['message']["reasoning_content"] or ""
             prediction = replace_tag_content(prediction, 'think').replace("<></>", "").strip()
             predictions[f"{cnt}"] = {
-                    "origin_prompt": promopt.replace('句子：\n\n', '句子：\n'),
+                    "origin_prompt": prompt.replace('句子：\n\n', '句子：\n'),
                     "prediction": prediction,
                     "refr": item["answer"],
                 }
