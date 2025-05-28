@@ -45,7 +45,7 @@ async def completion(cnt, item, predictions, endpoint="http://127.0.0.1:11434", 
             prediction = resp['choices'][0]['message']["content"] or resp['choices'][0]['message']["reasoning_content"] or ""
             prediction = replace_tag_content(prediction, 'think').replace("<></>", "").strip()
             predictions[f"{cnt}"] = {
-                    "origin_prompt": promopt,
+                    "origin_prompt": promopt.replace('句子：\n\n', '句子：\n'),
                     "prediction": prediction,
                     "refr": item["answer"],
                 }
