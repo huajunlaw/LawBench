@@ -53,7 +53,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">1-2</td>
     <td class="tg-qdov">知识问答</td>
     <td class="tg-0pky"><a href="https://jecqa.thunlp.org/">JEC_QA</a></td>
-    <td class="tg-0pky">Accuracy</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/Accuracy.md">Accuracy</td>
    <td class="tg-0pky">单选</td>
   </tr>
   <tr>
@@ -82,7 +82,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-4</td>
     <td class="tg-0pky">问题主题识别</td>
     <td class="tg-0pky"><a href="https://github.com/liuhuanyong/CrimeKgAssitant">CrimeKgAssitant</a></td>
-    <td class="tg-0pky">Accuracy</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/Accuracy.md">Accuracy</td>
      <td class="tg-0pky">单选</td>
   </tr>
   <tr>
@@ -110,7 +110,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-8</td>
     <td class="tg-qdov">论点挖掘</td>
       <td class="tg-0pky"><a href="http://cail.cipsc.org.cn/task_summit.html?raceID=5&cail_tag=2022">CAIL2022</a></td>
-    <td class="tg-0pky">Accuracy</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/Accuracy.md">Accuracy</td>
      <td class="tg-0pky">单选</td>
   </tr>
   <tr>
@@ -167,14 +167,14 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0lax">3-6</td>
     <td class="tg-0lax">案例分析</td>
       <td class="tg-0lax"><a href="https://jecqa.thunlp.org/">JEC_QA</a></td>
-    <td class="tg-0lax">Accuracy</td>
+    <td class="tg-0lax"><a href="https://github.com/huajunlaw/LawBench/blob/main/Accuracy.md">Accuracy</td>
      <td class="tg-0lax">单选</td>
   </tr>
   <tr>
     <td class="tg-0lax">3-7</td>
     <td class="tg-0lax">犯罪金额计算</td>
       <td class="tg-0lax"><a href="https://laic.cjbdi.com/">LAIC2021</a></td>
-    <td class="tg-0lax">Accuracy</td>
+    <td class="tg-0lax"><a href="https://github.com/huajunlaw/LawBench/blob/main/Accuracy.md">Accuracy</td>
      <td class="tg-0lax">回归</td>
   </tr>
   <tr>
