@@ -153,14 +153,14 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">3-4</td>
     <td class="tg-0pky">刑期预测(无法条内容)</td>
     <td class="tg-0pky"><a href="https://github.com/china-ai-law-challenge/cail2018">CAIL2018</a></td>
-    <td class="tg-0pky">Normalized log-distance</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/log-distance.md">Normalized log-distance</td>
      <td class="tg-0pky">回归</td>
   </tr>
   <tr>
     <td class="tg-0pky">3-5</td>
     <td class="tg-0pky">刑期预测(给定法条内容)</td>
     <td class="tg-0pky"><a href="https://github.com/china-ai-law-challenge/cail2018">CAIL2018</a></td>
-    <td class="tg-0pky">Normalized log-distance</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/log-distance.md">Normalized log-distance</td>
      <td class="tg-0pky">回归</td>
   </tr>
   <tr>
