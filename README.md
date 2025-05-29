@@ -89,14 +89,14 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-5</td>
     <td class="tg-0pky">阅读理解</td>
     <td class="tg-0pky"><a href="http://cail.cipsc.org.cn/task_summit.html?raceID=1&cail_tag=2019">CAIL2019</a></td>
-    <td class="tg-0pky">rc-F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">rc-F1</td>
      <td class="tg-0pky">抽取</td>
   </tr>
   <tr>
     <td class="tg-0pky">2-6</td>
     <td class="tg-0pky">命名实体识别</td>
     <td class="tg-0pky"><a href="https://github.com/china-ai-law-challenge/CAIL2021/tree/main/xxcq">CAIL2021</a></td>
-    <td class="tg-0pky">soft-F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/soft-F1.md">soft-F1</td>
      <td class="tg-0pky">抽取</td>
   </tr>
   <tr>
@@ -124,7 +124,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-10</td>
     <td class="tg-qdov">触发词提取</td>
     <td class="tg-0pky"><a href="https://github.com/thunlp/LEVEN">LEVEN</a></td>
-    <td class="tg-0pky">soft-F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/soft-F1.md">soft-F1</td>
      <td class="tg-0pky">抽取</td>
   </tr>
   <tr>
