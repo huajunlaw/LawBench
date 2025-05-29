@@ -61,21 +61,21 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-1</td>
     <td class="tg-0pky">文件校对</td>
     <td class="tg-0pky"><a href="http://cail.cipsc.org.cn/task_summit.html?raceID=2&cail_tag=2022">CAIL2022</a></td>
-    <td class="tg-0pky">F0.5</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">F0.5</td>
      <td class="tg-0pky">生成</td>
   </tr>
   <tr>
     <td class="tg-0pky">2-2</td>
     <td class="tg-0pky">纠纷焦点识别</td>
     <td class="tg-0pky"><a href="https://laic.cjbdi.com/">LAIC2021</a></td>
-    <td class="tg-0pky">F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">F1</td>
      <td class="tg-0pky">多选</td>
   </tr>
   <tr>
     <td class="tg-0pky">2-3</td>
     <td class="tg-0pky">婚姻纠纷鉴定</td>
     <td class="tg-0pky"><a href="https://aistudio.baidu.com/datasetdetail/181754">AIStudio</a></td>
-    <td class="tg-0pky">F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">F1</td>
      <td class="tg-0pky">多选</td>
   </tr>
   <tr>
@@ -117,7 +117,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">2-9</td>
     <td class="tg-qdov">事件检测</td>
     <td class="tg-0pky"><a href="https://github.com/thunlp/LEVEN">LEVEN</a></td>
-    <td class="tg-0pky">F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">F1</td>
      <td class="tg-0pky">多选</td>
   </tr>
   <tr>
@@ -132,7 +132,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">3-1</td>
     <td class="tg-0pky">法条预测(基于事实)</td>
     <td class="tg-0pky"><a href="https://github.com/china-ai-law-challenge/cail2018">CAIL2018</a></td>
-    <td class="tg-0pky">F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">F1</td>
      <td class="tg-0pky">多选</td>
   </tr>
   <tr>
@@ -146,7 +146,7 @@ LawBench经过精心设计，可对大语言模型的法律能力进行精确评
     <td class="tg-0pky">3-3</td>
     <td class="tg-0pky">罪名预测</td>
     <td class="tg-0pky"><a href="https://github.com/china-ai-law-challenge/cail2018">CAIL2018</a></td>
-    <td class="tg-0pky">F1</td>
+    <td class="tg-0pky"><a href="https://github.com/huajunlaw/LawBench/blob/main/f-score.md">F1</td>
       <td class="tg-0pky">多选</td>
   </tr>
   <tr>
