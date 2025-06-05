@@ -18,7 +18,7 @@ def replace_tag_content(content, tag):
 
 
 async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}, enable_think=False):
-    prompt = f"{item['instruction']}\n{item['question']}"
+    prompt = f"{item['instruction'][:3000]}\n{item['question']}"
     messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": prompt}]
     if enable_think:
         # temperature=0.6, top_p=0.95, top_k=20
@@ -44,12 +44,12 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
             logger.info(prediction)
 
 
-async def query_complitions(endpoint, api_key, model_name, params, output_file, data_list):
+async def query_complitions(endpoint, api_key, model_name, params, output_file, data_list, think=False):
     predictions = {}
     tasks = []
     for cnt, item in enumerate(data_list[:100]):
         try:
-            task = asyncio.create_task(_exec_single_query(cnt, item, predictions, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params))
+            task = asyncio.create_task(_exec_single_query(cnt, item, predictions, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params, enable_think=think))
         except Exception as E:
             logger.info(E)
             continue

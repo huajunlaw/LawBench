@@ -18,7 +18,8 @@ def main(argv):
     parser.add_argument("-s", "--shot", dest="shot",
                   help="shot: it should be a str")
     parser.add_argument("-p", "--parameters", dest="parameters",
-                  help="shot: parameters")
+                  help="params: parameters")
+    parser.add_argument("-t", '--think', default=True, action=argparse.BooleanOptionalAction)
 
 
     args = parser.parse_args(argv)
@@ -32,6 +33,7 @@ def main(argv):
         params = params.replace("'", '"')
     data_path = f"./data/{shot}"
     logger.info(data_path)
+    think = args.think
     prediction_path = "./predictions"
     data_files = os.listdir(data_path)
     out_path = os.path.join(prediction_path, shot, model_name)
@@ -47,7 +49,7 @@ def main(argv):
             continue
         data_list = read_json(input_file)
         logger.info(input_file)
-        asyncio.run(query_complitions(endpoint, api_key, model_name, params, output_file, data_list))
+        asyncio.run(query_complitions(endpoint, api_key, model_name, params, output_file, data_list, think))
 
 
 if __name__ == "__main__":
