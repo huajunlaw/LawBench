@@ -47,7 +47,7 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
 async def query_complitions(endpoint, api_key, model_name, params, output_file, data_list, think=False):
     predictions = {}
     tasks = []
-    for cnt, item in enumerate(data_list[:100]):
+    for cnt, item in enumerate(data_list):
         try:
             task = asyncio.create_task(_exec_single_query(cnt, item, predictions, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params, enable_think=think))
         except Exception as E:

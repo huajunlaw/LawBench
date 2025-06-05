@@ -20,8 +20,8 @@ def main(argv):
     parser.add_argument("-p", "--parameters", dest="parameters",
                   help="params: parameters")
     parser.add_argument("-t", '--think', default=True, action=argparse.BooleanOptionalAction)
-
-
+    parser.add_argument("-l", "--lenth", dest="lenth", help="task items number, must be int type")
+    parser.add_argument("-o", "--output", dest="output", help="output path, add model name postfix")
     args = parser.parse_args(argv)
     logger.info(args)
     endpoint = args.endpoint
@@ -34,11 +34,14 @@ def main(argv):
     data_path = f"./data/{shot}"
     logger.info(data_path)
     think = args.think
-    prediction_path = "./predictions"
     data_files = os.listdir(data_path)
-    out_path = os.path.join(prediction_path, shot, model_name)
+    if args.output:
+        out_path = os.path.join(args.output, model_name)
+    else:
+        out_path = os.path.join("./predictions", shot, model_name)
     if not os.path.exists(out_path):
         os.makedirs(out_path)
+    data_list_len = min(int(args.lenth), 500) if args.lenth else 500
     for data_file in data_files:
         input_file = os.path.join(data_path, data_file)
         if not os.path.exists(input_file):
@@ -49,7 +52,7 @@ def main(argv):
             continue
         data_list = read_json(input_file)
         logger.info(input_file)
-        asyncio.run(query_complitions(endpoint, api_key, model_name, params, output_file, data_list, think))
+        asyncio.run(query_complitions(endpoint, api_key, model_name, params, output_file, data_list[:data_list_len], think))
 
 
 if __name__ == "__main__":
