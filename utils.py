@@ -17,15 +17,19 @@ def replace_tag_content(content, tag):
     return re.sub(pattern, replacement, content, flags=re.DOTALL)
 
 
-async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}):
+async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}, enable_think=False):
     prompt = f"{item['instruction']}\n{item['question']}"
     messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": prompt}]
-    req_json = {"messages": messages, "repetition_penalty": 1.05, "temperature": 0.7, "top_k": 20, "top_p": 0.8}
+    if enable_think:
+        # temperature=0.6, top_p=0.95, top_k=20
+        req_json = {"messages": messages,"temperature": 0.6, "top_p": 0.95, "top_k": 20, "max_tokens": 8192, "presence_penalty": 1.5, "chat_template_kwargs": {"enable_thinking": False}}
+    else:
+        prompt += "/no_think"
+        req_json = {"messages": messages,"temperature": 0.7, "top_p": 0.8, "top_k": 20, "max_tokens": 8192, "presence_penalty": 1.5, "chat_template_kwargs": {"enable_thinking": False}}
     if model_name:
         req_json['model'] = model_name 
     if params and isinstance(params, str):
         req_json.update(json.loads(params))
-    logger.info(req_json)
     async with aiohttp.ClientSession() as session:
         async with session.post(f"{endpoint}/v1/chat/completions", json=req_json, headers={"Authorization": f"Bearer {api_key}"},timeout=timeout) as response:
             resp = await response.json()
@@ -36,6 +40,7 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
                     "prediction": prediction,
                     "refr": item["answer"],
                 }
+            logger.info(req_json)
             logger.info(prediction)
 
 
