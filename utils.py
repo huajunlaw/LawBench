@@ -41,6 +41,7 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
             prediction = replace_tag_content(prediction, 'think').replace("<></>", "").strip()
             predictions[f"{cnt}"] = {
                     "origin_prompt": origin_prompt,
+                    "real_prompt": prompt,
                     "prediction": prediction,
                     "refr": item["answer"],
                 }
