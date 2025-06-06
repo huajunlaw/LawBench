@@ -17,8 +17,12 @@ def replace_tag_content(content, tag):
     return re.sub(pattern, replacement, content, flags=re.DOTALL)
 
 
-async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}, enable_think=False):
-    prompt = f"{item['instruction'][:3000]}\n{item['question']}"
+async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}, enable_think=False, is_rag=False):
+    origin_prompt = f"{item['instruction']}\n{item['question']}"
+    if is_rag:
+        prompt = f"{item['rag_instruction'][:3000]}\n{item['question']}"
+    else:
+        prompt = origin_prompt
     messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": prompt}]
     if enable_think:
         # temperature=0.6, top_p=0.95, top_k=20
@@ -36,7 +40,7 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
             prediction = resp['choices'][0]['message']["content"] or resp['choices'][0]['message']["reasoning_content"] or ""
             prediction = replace_tag_content(prediction, 'think').replace("<></>", "").strip()
             predictions[f"{cnt}"] = {
-                    "origin_prompt": prompt.replace('句子：\n\n', '句子：\n'),
+                    "origin_prompt": origin_prompt,
                     "prediction": prediction,
                     "refr": item["answer"],
                 }
@@ -44,12 +48,12 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
             logger.info(prediction)
 
 
-async def query_complitions(endpoint, api_key, model_name, params, output_file, data_list, think=False):
+async def query_complitions(endpoint, api_key, model_name, params, output_file, data_list, think=False, rag=True):
     predictions = {}
     tasks = []
     for cnt, item in enumerate(data_list):
         try:
-            task = asyncio.create_task(_exec_single_query(cnt, item, predictions, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params, enable_think=think))
+            task = asyncio.create_task(_exec_single_query(cnt, item, predictions, endpoint=endpoint, api_key=api_key, model_name=model_name, params=params, enable_think=think, is_rag=rag))
         except Exception as E:
             logger.info(E)
             continue

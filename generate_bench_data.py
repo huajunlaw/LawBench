@@ -20,6 +20,7 @@ def main(argv):
     parser.add_argument("-p", "--parameters", dest="parameters",
                   help="params: parameters")
     parser.add_argument("-t", '--think', default=True, action=argparse.BooleanOptionalAction)
+    parser.add_argument("-r", '--rag', default=True, action=argparse.BooleanOptionalAction)
     parser.add_argument("-l", "--lenth", dest="lenth", help="task items number, must be int type")
     parser.add_argument("-o", "--output", dest="output", help="output path, add model name postfix")
     args = parser.parse_args(argv)
@@ -34,6 +35,7 @@ def main(argv):
     data_path = f"./data/{shot}"
     logger.info(data_path)
     think = args.think
+    rag = args.rag
     data_files = os.listdir(data_path)
     if args.output:
         out_path = os.path.join(args.output, model_name)
@@ -52,7 +54,7 @@ def main(argv):
             continue
         data_list = read_json(input_file)
         logger.info(input_file)
-        asyncio.run(query_complitions(endpoint, api_key, model_name, params, output_file, data_list[:data_list_len], think))
+        asyncio.run(query_complitions(endpoint, api_key, model_name, params, output_file, data_list[:data_list_len], think=think, rag=rag))
 
 
 if __name__ == "__main__":
