@@ -8,6 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.llms import VLLMOpenAI
+from langchain_core.documents import Document
 
 
 from loguru import logger
@@ -98,12 +99,14 @@ def get_vector_store(embedding_function, connection="", collection_name=""):
     return vector_store
 
 
-def index_documents(chunks, embedding_function, vector_store: PGVector):
+def index_documents(chunks, embedding_function, connection="", collection_name=""):
     """Indexes document chunks into the Chroma vector store."""
     logger.info(f"Indexing {len(chunks)} chunks...")
-    vectorstore = vector_store.from_documents(
+    vectorstore = PGVector.from_documents(
         documents=chunks,
         embedding=embedding_function,
+        connection=connection,
+        collection_name=collection_name
     )
     return vectorstore
 
@@ -127,12 +130,12 @@ def main():
     # Check if DB exists, if not, index. For simplicity, we might re-index here.
     # A more robust approach would check if indexing is needed.
     print("Attempting to index documents...")
+    vector_store = index_documents(chunks, embedding_function, connection=connection, collection_name=collection_name)
+
     # To load existing DB instead:
     vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
-    vector_store = index_documents(chunks, embedding_function, vector_store)
-
     # 5. Create RAG Chain
-    rag_chain = create_rag_chain(vector_store, llm_model_name="qwen3:8b") # Use the chosen Qwen 3 model
+    rag_chain = create_rag_chain(vector_store) # Use the chosen Qwen 3 model
 
     # 6. Query
     query_question = "What is the main topic of the document?" # Replace with a specific question
