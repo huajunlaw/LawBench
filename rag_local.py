@@ -7,7 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_community.chat_models import ChatLlamaCpp
+from langchain_community.llms import VLLMOpenAI
 
 
 from loguru import logger
@@ -39,21 +39,16 @@ def split_documents(documents):
     logger.info(f"Split into {len(all_splits)} chunks")
     return all_splits
 
-def create_rag_chain(vector_store, llm_model_name="qwen3:8b", context_window=8192):
+
+def create_rag_chain(vector_store, llm_model_name="Qwen3-8B-Base", context_window=8192):
     """Creates the RAG chain."""
     # Initialize the LLM
-    llm = ChatLlamaCpp(
-    temperature=0.5,
-    model_path="Qwen3-Embedding-0.6B-Q8_0.gguf",
-    n_ctx=10000,
-    n_gpu_layers=8,
-    n_batch=300,  # Should be between 1 and n_ctx, consider the amount of VRAM in your GPU.
-    max_tokens=512,
-    n_threads=4,
-    repeat_penalty=1.5,
-    top_p=0.5,
-    verbose=True,
-)
+
+    llm = VLLMOpenAI(openai_api_key="EMPTY", openai_api_base="http://localhost:8000/v1",
+                     model_name=llm_model_name,
+                     model_kwargs={"stop": ["."]},
+                     )
+
     print(f"Initialized ChatOllama with model: {llm_model_name}, context window: {context_window}")
 
     # Create the retriever
@@ -81,6 +76,8 @@ Question: {question}
     )
     print("RAG chain created.")
     return rag_chain
+
+
 def query_rag(chain, question):
     """Queries the RAG chain and prints the response."""
     print("\nQuerying RAG chain...")
@@ -113,27 +110,11 @@ def index_documents(chunks, embedding_function, vector_store: PGVector):
 
 def main():
     """."""
-    # connection = "postgresql+psycopg://batchcom:@localhost:5432/postgres"
-    # collection_name = "all_laws_china"
-    # embedding_function = get_embedding_function()
-    # docs = [
-    #     Document(
-    #         page_content="there are cats in the pond",
-    #         metadata={"id": 1, "location": "pond", "topic": "animals"},
-    #     ),
-    #     Document(
-    #         page_content="ducks are also found in the pond",
-    #         metadata={"id": 2, "location": "pond", "topic": "animals"},
-    #     ),
-    # ]
-    # vector_store = get_vector_store(embedding_function, connection, collection_name)
-    # vector_store.add_documents(docs, ids=[doc.metadata["id"] for doc in docs])
-
-# --- Main Execution ---
-if __name__ == "__main__":
     # 1. Load Documents
     DATA_PATH = "data/"
     PDF_FILENAME = "llama2.pdf" # Replace with your PDF filename
+    connection = "postgresql+psycopg://batchcom:@localhost:5432/postgres"
+    collection_name = "all_laws_china"
     docs = load_documents(DATA_PATH, PDF_FILENAME)
 
     # 2. Split Documents
@@ -147,7 +128,7 @@ if __name__ == "__main__":
     # A more robust approach would check if indexing is needed.
     print("Attempting to index documents...")
     # To load existing DB instead:
-    vector_store = get_vector_store(embedding_function)
+    vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
     vector_store = index_documents(chunks, embedding_function, vector_store)
 
     # 5. Create RAG Chain
@@ -159,3 +140,6 @@ if __name__ == "__main__":
 
     query_question_2 = "Summarize the introduction section." # Another example
     query_rag(rag_chain, query_question_2)
+
+if __name__ == "__main__":
+    main()
