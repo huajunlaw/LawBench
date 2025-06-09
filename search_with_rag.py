@@ -50,14 +50,14 @@ def create_rag_chain(vector_store, llm_model_name="Qwen3-8B-Base", context_windo
                      model_kwargs={"stop": ["."]},
                      )
 
-    print(f"Initialized ChatOllama with model: {llm_model_name}, context window: {context_window}")
+    logger.info(f"Initialized ChatOllama with model: {llm_model_name}, context window: {context_window}")
 
     # Create the retriever
     retriever = vector_store.as_retriever(
         search_type="similarity", # Or "mmr"
         search_kwargs={'k': 3} # Retrieve top 3 relevant chunks
     )
-    print("Retriever initialized.")
+    logger.info("Retriever initialized.")
 
     # Define the prompt template
     template = """Answer the question based ONLY on the following context:
@@ -66,7 +66,7 @@ def create_rag_chain(vector_store, llm_model_name="Qwen3-8B-Base", context_windo
 Question: {question}
 """
     prompt = ChatPromptTemplate.from_template(template)
-    print("Prompt template created.")
+    logger.info("Prompt template created.")
 
     # Define the RAG chain using LCEL
     rag_chain = (
@@ -75,17 +75,17 @@ Question: {question}
 | llm
 | StrOutputParser()
     )
-    print("RAG chain created.")
+    logger.info("RAG chain created.")
     return rag_chain
 
 
 def query_rag(chain, question):
-    """Queries the RAG chain and prints the response."""
-    print("\nQuerying RAG chain...")
-    print(f"Question: {question}")
+    """Queries the RAG chain and logger.infos the response."""
+    logger.info("\nQuerying RAG chain...")
+    logger.info(f"Question: {question}")
     response = chain.invoke(question)
-    print("\nResponse:")
-    print(response)
+    logger.info("\nResponse:")
+    logger.info(response)
 
 
 def get_vector_store(embedding_function, connection="", collection_name=""):
@@ -129,7 +129,7 @@ def main():
     # 4. Index Documents (Only needs to be done once per document set)
     # Check if DB exists, if not, index. For simplicity, we might re-index here.
     # A more robust approach would check if indexing is needed.
-    print("Attempting to index documents...")
+    logger.info("Attempting to index documents...")
     vector_store = index_documents(chunks, embedding_function, connection=connection, collection_name=collection_name)
 
     # To load existing DB instead:
