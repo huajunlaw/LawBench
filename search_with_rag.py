@@ -1,8 +1,6 @@
-from operator import length_hint
 import os
 import argparse, sys
 
-from langchain_community.embeddings import LlamaCppEmbeddings
 from langchain_postgres import PGVector
 from langchain_community.document_loaders import PyPDFLoader # Or UnstructuredPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -10,14 +8,20 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.llms import VLLMOpenAI
+from langchain_openai import OpenAIEmbeddings
 
 
 from loguru import logger
 
 
-def get_embedding_function(model_path="Qwen3-Embedding-0.6B-Q8_0.gguf"):
+def get_embedding_function(model="Qwen3-Embedding-8B"):
     """."""
-    return LlamaCppEmbeddings(model_path=model_path)  # type:ignore
+    embeddings = OpenAIEmbeddings(model=model, base_url='http://localhost:8001/v1',)
+    # With the `text-embedding-3` class
+    # of models, you can specify the size
+    # of the embeddings you want returned.
+    # dimensions=1024
+    return embeddings
 
 
 def load_documents(DATA_PATH, PDF_FILENAME):
