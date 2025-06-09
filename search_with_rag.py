@@ -121,12 +121,13 @@ def main(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--index', default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument("-m", "--model", dest="model",
-                  help="model: it should be a str ")
+    parser.add_argument("-m", "--model", dest="model", help="model: it should be a str ")
+    parser.add_argument("-e", "--embed", dest="embed", help="embed model: it should be a str ")
     args = parser.parse_args(argv)
     logger.info(args)
     # 3. Get Embedding Function
-    embedding_function = get_embedding_function() # Using Ollama nomic-embed-text
+    embed = args.embed or "Qwen3-Embedding-8B-Q8_0.gguf"
+    embedding_function = get_embedding_function(embed) # Using Ollama nomic-embed-text
 
     # 4. Index Documents (Only needs to be done once per document set)
     # Check if DB exists, if not, index. For simplicity, we might re-index here.
