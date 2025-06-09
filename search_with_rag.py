@@ -1,4 +1,6 @@
+from operator import length_hint
 import os
+import argparse, sys
 
 from langchain_community.embeddings import LlamaCppEmbeddings
 from langchain_postgres import PGVector
@@ -8,7 +10,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.llms import VLLMOpenAI
-from langchain_core.documents import Document
 
 
 from loguru import logger
@@ -23,7 +24,6 @@ def load_documents(DATA_PATH, PDF_FILENAME):
     """Loads documents from the specified data path."""
     pdf_path = os.path.join(DATA_PATH, PDF_FILENAME)
     loader = PyPDFLoader(pdf_path)
-    # loader = UnstructuredPDFLoader(pdf_path) # Alternative
     documents = loader.load()
     logger.info(f"Loaded {len(documents)} page(s) from {pdf_path}")
     return documents
@@ -111,31 +111,38 @@ def index_documents(chunks, embedding_function, connection="", collection_name="
     return vectorstore
 
 
-def main():
+def main(argv):
     """."""
-    # 1. Load Documents
+    # 0. constant
     DATA_PATH = "data/"
     PDF_FILENAME = "llama2.pdf" # Replace with your PDF filename
     connection = "postgresql+psycopg://batchcom:@localhost:5432/postgres"
     collection_name = "all_laws_china"
-    docs = load_documents(DATA_PATH, PDF_FILENAME)
 
-    # 2. Split Documents
-    chunks = split_documents(docs)
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--index', default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument("-m", "--model", dest="model",
+                  help="model: it should be a str ")
+    args = parser.parse_args(argv)
+    logger.info(args)
     # 3. Get Embedding Function
     embedding_function = get_embedding_function() # Using Ollama nomic-embed-text
 
     # 4. Index Documents (Only needs to be done once per document set)
     # Check if DB exists, if not, index. For simplicity, we might re-index here.
     # A more robust approach would check if indexing is needed.
-    logger.info("Attempting to index documents...")
-    vector_store = index_documents(chunks, embedding_function, connection=connection, collection_name=collection_name)
+    if args.index:
+        # 1. Load Documents
+        docs = load_documents(DATA_PATH, PDF_FILENAME)
+        # 2. Split Documents
+        chunks = split_documents(docs)
+        logger.info("Attempting to index documents...")
+        vector_store = index_documents(chunks, embedding_function, connection=connection, collection_name=collection_name)
 
     # To load existing DB instead:
     vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
     # 5. Create RAG Chain
-    rag_chain = create_rag_chain(vector_store) # Use the chosen Qwen 3 model
+    rag_chain = create_rag_chain(vector_store, llm_model_name=args.model) # Use the chosen Qwen 3 model
 
     # 6. Query
     query_question = "What is the main topic of the document?" # Replace with a specific question
@@ -145,4 +152,4 @@ def main():
     query_rag(rag_chain, query_question_2)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
