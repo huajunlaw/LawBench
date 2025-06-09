@@ -1,17 +1,19 @@
+import argparse
 import os
-import argparse, sys
+import sys
 
-from langchain_postgres import PGVector
-from langchain_community.document_loaders import PyPDFLoader # Or UnstructuredPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import \
+    PyPDFLoader  # Or UnstructuredPDFLoader
+from langchain_community.llms import VLLMOpenAI
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
-from langchain_community.llms import VLLMOpenAI
 from langchain_openai import OpenAIEmbeddings
-
-
+from langchain_postgres import PGVector
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from loguru import logger
+
+os.environ["OPENAI_API_KEY"] = "EMPTY"
 
 
 def get_embedding_function(model="Qwen3-Embedding-8B"):
@@ -31,6 +33,7 @@ def load_documents(DATA_PATH, PDF_FILENAME):
     documents = loader.load()
     logger.info(f"Loaded {len(documents)} page(s) from {pdf_path}")
     return documents
+
 
 def split_documents(documents):
     """Splits documents into smaller chunks."""
@@ -58,8 +61,8 @@ def create_rag_chain(vector_store, llm_model_name="Qwen3-8B-Base", context_windo
 
     # Create the retriever
     retriever = vector_store.as_retriever(
-        search_type="similarity", # Or "mmr"
-        search_kwargs={'k': 3} # Retrieve top 3 relevant chunks
+        search_type="similarity",  # Or "mmr"
+        search_kwargs={'k': 3}  # Retrieve top 3 relevant chunks
     )
     logger.info("Retriever initialized.")
 
@@ -119,7 +122,7 @@ def main(argv):
     """."""
     # 0. constant
     DATA_PATH = "data/"
-    PDF_FILENAME = "llama2.pdf" # Replace with your PDF filename
+    PDF_FILENAME = "llama2.pdf"
     connection = "postgresql+psycopg://batchcom:@localhost:5432/postgres"
     collection_name = "all_laws_china"
 
@@ -130,8 +133,8 @@ def main(argv):
     args = parser.parse_args(argv)
     logger.info(args)
     # 3. Get Embedding Function
-    embed = args.embed or "Qwen3-Embedding-8B-Q8_0.gguf"
-    embedding_function = get_embedding_function(embed) # Using Ollama nomic-embed-text
+    embed = args.embed or "Qwen3-Embedding-8B"
+    embedding_function = get_embedding_function(embed)
 
     # 4. Index Documents (Only needs to be done once per document set)
     # Check if DB exists, if not, index. For simplicity, we might re-index here.
@@ -147,14 +150,15 @@ def main(argv):
     # To load existing DB instead:
     vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
     # 5. Create RAG Chain
-    rag_chain = create_rag_chain(vector_store, llm_model_name=args.model) # Use the chosen Qwen 3 model
+    rag_chain = create_rag_chain(vector_store, llm_model_name=args.model)  # Use the chosen Qwen 3 model
 
     # 6. Query
-    query_question = "What is the main topic of the document?" # Replace with a specific question
+    query_question = "What is the main topic of the document?"  # Replace with a specific question
     query_rag(rag_chain, query_question)
 
-    query_question_2 = "Summarize the introduction section." # Another example
+    query_question_2 = "Summarize the introduction section."  # Another example
     query_rag(rag_chain, query_question_2)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
