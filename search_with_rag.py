@@ -1,51 +1,24 @@
 import argparse
-import os
 import sys
 
-from langchain_community.document_loaders import \
-    PyPDFLoader  # Or UnstructuredPDFLoader
+
 from langchain_community.llms import VLLMOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import OpenAIEmbeddings
 from langchain_postgres import PGVector
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from loguru import logger
 
-os.environ["OPENAI_API_KEY"] = "EMPTY"
+from import_china_laws_to_vector_store import index_documents
 
 
 def get_embedding_function(model="Qwen3-Embedding-8B"):
     """."""
     embeddings = OpenAIEmbeddings(model=model, base_url='http://localhost:8001/v1',)
-    # With the `text-embedding-3` class
-    # of models, you can specify the size
-    # of the embeddings you want returned.
+    # With the `text-embedding-3` class of models, you can specify the size of the embeddings you want returned.
     # dimensions=1024
     return embeddings
-
-
-def load_documents(DATA_PATH, PDF_FILENAME):
-    """Loads documents from the specified data path."""
-    pdf_path = os.path.join(DATA_PATH, PDF_FILENAME)
-    loader = PyPDFLoader(pdf_path)
-    documents = loader.load()
-    logger.info(f"Loaded {len(documents)} page(s) from {pdf_path}")
-    return documents
-
-
-def split_documents(documents):
-    """Splits documents into smaller chunks."""
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-        length_function=len,
-        is_separator_regex=False,
-    )
-    all_splits = text_splitter.split_documents(documents)
-    logger.info(f"Split into {len(all_splits)} chunks")
-    return all_splits
 
 
 def create_rag_chain(vector_store, llm_model_name="Qwen3-8B-Base", context_window=8192):
@@ -54,7 +27,7 @@ def create_rag_chain(vector_store, llm_model_name="Qwen3-8B-Base", context_windo
 
     llm = VLLMOpenAI(openai_api_key="EMPTY", openai_api_base="http://localhost:8000/v1",
                      model_name=llm_model_name,
-                     model_kwargs={"stop": ["."]},
+                     # model_kwargs={"stop": ["."]},
                      )
 
     logger.info(f"Initialized ChatOllama with model: {llm_model_name}, context window: {context_window}")
@@ -106,28 +79,19 @@ def get_vector_store(embedding_function, connection="", collection_name=""):
     return vector_store
 
 
-def index_documents(chunks, embedding_function, connection="", collection_name=""):
-    """Indexes document chunks into the Chroma vector store."""
-    logger.info(f"Indexing {len(chunks)} chunks...")
-    vectorstore = PGVector.from_documents(
-        documents=chunks,
-        embedding=embedding_function,
-        connection=connection,
-        collection_name=collection_name
-    )
-    return vectorstore
-
-
 def main(argv):
     """."""
     # 0. constant
-    DATA_PATH = "data/"
-    PDF_FILENAME = "llama2.pdf"
     connection = "postgresql+psycopg://batchcom:@localhost:5432/postgres"
     collection_name = "all_laws_china"
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--index', default=False, action=argparse.BooleanOptionalAction)
+    subparsers = parser.add_subparsers(dest="command")
+
+    commit_parser = subparsers.add_parser("index", help="Record changes to the repository")
+
+    commit_parser.add_argument("-p", "--path", help="原始文件所在路径", required=True)
+
     parser.add_argument("-m", "--model", dest="model", help="model: it should be a str ")
     parser.add_argument("-e", "--embed", dest="embed", help="embed model: it should be a str ")
     args = parser.parse_args(argv)
@@ -139,25 +103,21 @@ def main(argv):
     # 4. Index Documents (Only needs to be done once per document set)
     # Check if DB exists, if not, index. For simplicity, we might re-index here.
     # A more robust approach would check if indexing is needed.
-    if args.index:
-        # 1. Load Documents
-        docs = load_documents(DATA_PATH, PDF_FILENAME)
-        # 2. Split Documents
-        chunks = split_documents(docs)
-        logger.info("Attempting to index documents...")
-        vector_store = index_documents(chunks, embedding_function, connection=connection, collection_name=collection_name)
-
+    if args.command == 'index':
+        DATA_PATH = args.path
+        index_documents(DATA_PATH, embedding_function, connection=connection, collection_name=collection_name)
+    return
     # To load existing DB instead:
-    vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
-    # 5. Create RAG Chain
-    rag_chain = create_rag_chain(vector_store, llm_model_name=args.model)  # Use the chosen Qwen 3 model
+    # vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
+    # # 5. Create RAG Chain
+    # rag_chain = create_rag_chain(vector_store, llm_model_name=args.model)  # Use the chosen Qwen 3 model
 
-    # 6. Query
-    query_question = "What is the main topic of the document?"  # Replace with a specific question
-    query_rag(rag_chain, query_question)
+    # # 6. Query
+    # query_question = "What is the main topic of the document?"  # Replace with a specific question
+    # query_rag(rag_chain, query_question)
 
-    query_question_2 = "Summarize the introduction section."  # Another example
-    query_rag(rag_chain, query_question_2)
+    # query_question_2 = "Summarize the introduction section."  # Another example
+    # query_rag(rag_chain, query_question_2)
 
 
 if __name__ == "__main__":
