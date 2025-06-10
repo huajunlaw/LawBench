@@ -30,6 +30,8 @@ def metadata_func(record: dict, metadata: dict, meta_type) -> dict:
 
 def load_documents(file_path):
     """Loads documents from the specified data path."""
+    if not os.path.isfile(file_path):
+        return []
     content_key_level = '. | [.level1, .level2, .level3] | join("\n")| walk(if type == "string" then gsub("#"; "") else . end)'
     loader_level = JSONLoader(file_path=file_path, jq_schema='.[]', content_key=content_key_level, is_content_key_jq_parsable=True, metadata_func=partial(metadata_func, meta_type='levels'), text_content=False)
     loader_desc = JSONLoader(file_path=file_path, jq_schema='.[]', content_key='desc', text_content=False, metadata_func=partial(metadata_func, meta_type='desc'))
@@ -51,30 +53,19 @@ def split_documents(documents):
     return all_splits
 
 
-async def _store_to_vector(chunks, embedding_function, connection="", collection_name=""):
-    await PGVector.afrom_documents(
-        documents=chunks,
-        embedding=embedding_function,
-        connection=connection,
-        collection_name=collection_name
-    )
-
-
-async def _save_chunks(chunks, embedding_function, connection="", collection_name=""):
+async def _save_chunks(chunks, embedding_function, connection, collection_name):
     tasks = []
-
-    for i in range(10):
+    for i in range(20):
         start = i * 200
         stop = (i+1) * 200
         if start > len(chunks):
             break
-        logger.info(f"Indexing {len(chunks[start:stop])} chunks...")
-        task = asyncio.create_task(_store_to_vector(chunks[start:stop], embedding_function, connection, collection_name))
+        task = asyncio.create_task(PGVector.afrom_documents(documents=chunks[start:stop], embedding=embedding_function, connection=connection, collection_name=collection_name))
         tasks.append(task)
     await asyncio.gather(*tasks, return_exceptions=False)
 
 
-def index_documents(data_path, embedding_function, connection="", collection_name=""):
+def index_documents(data_path, embedding_function, connection, collection_name):
     """Indexes document chunks into the Chroma vector store."""
     chunks = []
     for x in os.listdir(data_path):
