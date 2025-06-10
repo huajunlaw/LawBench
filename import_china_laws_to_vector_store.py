@@ -37,9 +37,14 @@ def load_documents(file_path):
     if not os.path.isfile(file_path):
         return []
     content_key_level = '. | [.level1, .level2, .level3] | join("\n")| walk(if type == "string" then gsub("#"; "") else . end)'
-    loader_level = JSONLoader(file_path=file_path, jq_schema='.[]', content_key=content_key_level, is_content_key_jq_parsable=True, metadata_func=partial(metadata_func, meta_type='levels'), text_content=False)
-    loader_desc = JSONLoader(file_path=file_path, jq_schema='.[]', content_key='desc', text_content=False, metadata_func=partial(metadata_func, meta_type='desc'))
-    documents = loader_level.load() + loader_desc.load()
+    try:
+        loader_level = JSONLoader(file_path=file_path, jq_schema='.[]', content_key=content_key_level, is_content_key_jq_parsable=True, metadata_func=partial(metadata_func, meta_type='levels'), text_content=False)
+        loader_desc = JSONLoader(file_path=file_path, jq_schema='.[]', content_key='desc', text_content=False, metadata_func=partial(metadata_func, meta_type='desc'))
+        documents = loader_level.load() + loader_desc.load()
+    except Exception as e:
+        logger.info(f"Loaded 0 page(s) from {file_path}")
+        logger.info(e)
+        return []
     logger.info(f"Loaded {len(documents)} page(s) from {file_path}")
     return documents
 
