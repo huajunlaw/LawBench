@@ -24,7 +24,11 @@ def get_embedding_function(model="Qwen3-Embedding-8B"):
 
 def metadata_func(record: dict, metadata: dict, meta_type) -> dict:
     metadata["type"] = meta_type
-    metadata["content"] = json.dumps(record, ensure_ascii=False)
+    metadata["raw_content"] = json.dumps(record, ensure_ascii=False)
+    if meta_type == 'desc':
+        metadata["content"] = f"{record['level1']} {record['level2']} {record['level3']}"
+    elif meta_type == 'levels':
+        metadata["content"] = record['desc']
     return metadata
 
 
