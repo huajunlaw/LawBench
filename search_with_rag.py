@@ -85,14 +85,13 @@ def main(argv):
     collection_name = "all_laws_china"
 
     parser = argparse.ArgumentParser()
+
     subparsers = parser.add_subparsers(dest="command")
-
-    commit_parser = subparsers.add_parser("index", help="Record changes to the repository")
-
+    commit_parser = subparsers.add_parser("index", help="导入向量数据库")
     commit_parser.add_argument("-p", "--path", help="原始文件所在路径", required=True)
 
-    parser.add_argument("-m", "--model", dest="model", help="model: it should be a str ")
-    parser.add_argument("-e", "--embed", dest="embed", help="embed model: it should be a str ")
+    parser.add_argument("-m", "--model", dest="model", help="LLM model: it should be a str of serverd_name.")
+    parser.add_argument("-e", "--embed", dest="embed", help="Embedding model: it should be a str of serverd_name")
     args = parser.parse_args(argv)
     logger.info(args)
     # 3. Get Embedding Function
@@ -105,18 +104,17 @@ def main(argv):
     if args.command == 'index':
         DATA_PATH = args.path
         index_documents(DATA_PATH, embedding_function, connection=connection, collection_name=collection_name)
-    return
     # To load existing DB instead:
-    # vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
-    # # 5. Create RAG Chain
-    # rag_chain = create_rag_chain(vector_store, llm_model_name=args.model)  # Use the chosen Qwen 3 model
+    vector_store = get_vector_store(embedding_function, connection=connection, collection_name=collection_name)
+    # 5. Create RAG Chain
+    rag_chain = create_rag_chain(vector_store, llm_model_name=args.model)  # Use the chosen Qwen 3 model
 
-    # # 6. Query
-    # query_question = "What is the main topic of the document?"  # Replace with a specific question
-    # query_rag(rag_chain, query_question)
+    # 6. Query
+    query_question = "What is the main topic of the document?"  # Replace with a specific question
+    query_rag(rag_chain, query_question)
 
-    # query_question_2 = "Summarize the introduction section."  # Another example
-    # query_rag(rag_chain, query_question_2)
+    query_question_2 = "Summarize the introduction section."  # Another example
+    query_rag(rag_chain, query_question_2)
 
 
 if __name__ == "__main__":

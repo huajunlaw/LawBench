@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import json
 import os
 import sys
@@ -29,7 +30,7 @@ def metadata_func(record: dict, metadata: dict, meta_type) -> dict:
 
 def load_documents(file_path):
     """Loads documents from the specified data path."""
-    content_key_level = '. | [.level1, .level2,.level3] | join("\n")| walk(if type == "string" then gsub("#"; "") else . end)'
+    content_key_level = '. | [.level1, .level2, .level3] | join("\n")| walk(if type == "string" then gsub("#"; "") else . end)'
     loader_level = JSONLoader(file_path=file_path, jq_schema='.[]', content_key=content_key_level, is_content_key_jq_parsable=True, metadata_func=partial(metadata_func, meta_type='levels'), text_content=False)
     loader_desc = JSONLoader(file_path=file_path, jq_schema='.[]', content_key='desc', text_content=False, metadata_func=partial(metadata_func, meta_type='desc'))
     documents = loader_level.load() + loader_desc.load()
@@ -50,22 +51,37 @@ def split_documents(documents):
     return all_splits
 
 
+async def _store_to_vector(chunks, embedding_function, connection="", collection_name=""):
+    await PGVector.afrom_documents(
+        documents=chunks,
+        embedding=embedding_function,
+        connection=connection,
+        collection_name=collection_name
+    )
+
+
+async def _save_chunks(chunks, embedding_function, connection="", collection_name=""):
+    tasks = []
+
+    for i in range(10):
+        start = i * 200
+        stop = (i+1) * 200
+        if start > len(chunks):
+            break
+        logger.info(f"Indexing {len(chunks[start:stop])} chunks...")
+        task = asyncio.create_task(_store_to_vector(chunks[start:stop], embedding_function, connection, collection_name))
+        tasks.append(task)
+    await asyncio.gather(*tasks, return_exceptions=False)
+
+
 def index_documents(data_path, embedding_function, connection="", collection_name=""):
     """Indexes document chunks into the Chroma vector store."""
-    # 1. Load Documents
+    chunks = []
     for x in os.listdir(data_path):
-        file_path = os.path.join(data_path, x)
-        docs = load_documents(file_path)
-        # 2. Split Documents
-        chunks = split_documents(docs)
-        logger.info("Attempting to index documents...")
-        logger.info(f"Indexing {len(chunks)} chunks...")
-        PGVector.from_documents(
-            documents=chunks,
-            embedding=embedding_function,
-            connection=connection,
-            collection_name=collection_name
-        )
+        chunks += split_documents(load_documents(os.path.join(data_path, x)))
+        if len(chunks) > 2000:
+            asyncio.run(_save_chunks(chunks, embedding_function, connection, collection_name))
+            chunks = []
 
 
 def main(argv):
