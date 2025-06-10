@@ -1,9 +1,8 @@
 import argparse
+import json
 import os
 import sys
-import json
 from functools import partial
-
 
 from langchain_community.document_loaders import JSONLoader
 from langchain_openai import OpenAIEmbeddings
