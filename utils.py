@@ -23,7 +23,7 @@ async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:
         prompt = f"{item['rag_instruction'][:3000]}\n{item['question']}"
     else:
         prompt = origin_prompt
-    messages = [{"role": "system", "content": "你是一个法官，旨在针对各种案件类型、审判程序和事实生成相应的法院裁决。你的回答不能含糊、有争议或者离题"},{"role": "user", "content": prompt}]
+    messages = [{"role": "system", "content": "你是一名法律专家，给你一些参考内容，你可以作为参考，如果没有你需要的信息，你可以自行回答。你只需回答问题，不要做任何解释和说明。"},{"role": "user", "content": prompt}]
     if enable_think:
         # temperature=0.6, top_p=0.95, top_k=20
         req_json = {"messages": messages,"temperature": 0.6, "top_p": 0.95, "top_k": 20, "max_tokens": 8192, "presence_penalty": 1.5, "chat_template_kwargs": {"enable_thinking": True}}
