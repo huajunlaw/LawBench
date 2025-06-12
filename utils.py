@@ -20,7 +20,7 @@ def replace_tag_content(content, tag):
 async def _exec_single_query(cnt, item, predictions, endpoint="http://127.0.0.1:11434", api_key="xxx", model_name="", params: dict= {}, enable_think=False, is_rag=False):
     origin_prompt = f"{item['instruction']}\n{item['question']}"
     if is_rag:
-        prompt = f"{item['rag_instruction'][:3000]}\n{item['question']}"
+        prompt = f"{item['rag_instruction'][:10000]}\n{item['question']}"
     else:
         prompt = origin_prompt
     messages = [{"role": "system", "content": "你是一名法律专家，给你一些参考内容，你可以作为参考，如果没有你需要的信息，你可以自行回答。你只需回答问题，不要做任何解释和说明。"},{"role": "user", "content": prompt}]
