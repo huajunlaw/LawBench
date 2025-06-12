@@ -110,10 +110,10 @@ def main(argv):
     rag_chain = create_rag_chain(vector_store, llm_model_name=args.model)  # Use the chosen Qwen 3 model
 
     # 6. Query
-    query_question = "What is the main topic of the document?"  # Replace with a specific question
+    query_question = "<中华人民共和国宪法>第一章内容是什么"  # Replace with a specific question
     query_rag(rag_chain, query_question)
 
-    query_question_2 = "Summarize the introduction section."  # Another example
+    query_question_2 = "<中华人民共和国宪法>第一章内容是什么"  # Another example
     query_rag(rag_chain, query_question_2)
 
 
