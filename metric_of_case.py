@@ -1,26 +1,21 @@
 import argparse
 import sys
 
-from langchain_community.tools import DuckDuckGoSearchRun
 from loguru import logger
 
 
-def exe_search(query="中华人民共和国《宪法》", engine=DuckDuckGoSearchRun):
-    """执行搜索."""
-    search = engine()
-    return search.invoke(query)
+def mertic():
+    """."""
 
 
 def main(argv):
-    """主入口."""
+    """."""
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-m", "--message", help="搜索的内容", required=True)
 
     args = parser.parse_args(argv)
     logger.info(args)
-
-    logger.info(exe_search())
 
 
 if __name__ == "__main__":
